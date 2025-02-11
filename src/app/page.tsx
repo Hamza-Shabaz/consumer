@@ -138,7 +138,7 @@ export default function Home() {
       </footer>
 
       <iframe
-        src="http://localhost:3000"
+        src="https://widget-three-phi.vercel.app/"
         ref={iframeRef}
         style={{
           border: "none",
