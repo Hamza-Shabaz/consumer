@@ -28,13 +28,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        <iframe
-          src="https://widget-three-phi.vercel.app/"
-          width="600"
-          height="800"
-          style={{ border: "none", position: "fixed", bottom: "0", right: "0" }}
-          sandbox="allow-scripts allow-same-origin"
-        ></iframe>
       </body>
     </html>
   );

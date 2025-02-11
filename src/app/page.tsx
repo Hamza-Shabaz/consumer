@@ -1,7 +1,45 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useRef, useEffect, useState } from "react";
 
 export default function Home() {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [iframeHeight, setIframeHeight] = useState(200);
+  const [iframeWidth, setIframeWidth] = useState(200);
+
+  useEffect(() => {
+    const handleIframeLoad = () => {
+      console.log("Iframe loaded, sending initial message...");
+      iframeRef.current?.contentWindow?.postMessage("set-dimensions", "*");
+    };
+
+    const handleResizeMessage = (event: MessageEvent) => {
+      if (event.data?.type === "resize") {
+        const { height, width } = event.data;
+        console.log("Received resize message:", { height, width });
+        setIframeHeight(height);
+        setIframeWidth(width);
+      }
+    };
+
+    // Add event listeners
+    window.addEventListener("message", handleResizeMessage);
+
+    const iframe = iframeRef.current;
+    if (iframe) {
+      iframe.addEventListener("load", handleIframeLoad);
+    }
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("message", handleResizeMessage);
+      if (iframe) {
+        iframe.removeEventListener("load", handleIframeLoad);
+      }
+    };
+  }, []);
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
@@ -98,6 +136,22 @@ export default function Home() {
           Go to nextjs.org →
         </a>
       </footer>
+
+      <iframe
+        src="http://localhost:3000"
+        ref={iframeRef}
+        style={{
+          border: "none",
+          position: "fixed",
+          bottom: "0",
+          right: "0",
+          height: `${iframeHeight}px`,
+          width: `${iframeWidth}px`,
+          transition: "height 0.3s ease, width 0.3s ease", // Smooth transition
+        }}
+        sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+        title="Embedded Widget"
+      />
     </div>
   );
 }
